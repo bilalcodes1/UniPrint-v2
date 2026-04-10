@@ -7,7 +7,7 @@
 <meta name="description" content="نظام هجين لإدارة طلبات الطباعة في مكتبات جامعة الأنبار. يعمل بدون إنترنت ومع الإنترنت.">
 <meta property="og:title" content="UniPrint">
 <meta property="og:description" content="نظام طباعة ذكي للمكتبات الجامعية">
-<meta property="og:image" content="https://raw.githubusercontent.com/bilalcodes1/UniPrint/main/landing/preview.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/bilalcodes1/UniPrint-v2/main/landing/preview.png">
 
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -108,7 +108,7 @@
   </div>
 
   <div class="download-row">
-    <a href="https://github.com/bilalcodes1/UniPrint/releases/latest/download/UniPrint-Setup.exe"
+    <a href="https://github.com/bilalcodes1/UniPrint-v2/releases/latest/download/UniPrint-Setup.exe"
        class="btn-download btn-win" id="btn-win">
       <span class="btn-icon">🪟</span>
       <span class="btn-text">
@@ -116,7 +116,7 @@
         <small>Windows 10/11 — 64-bit</small>
       </span>
     </a>
-    <a href="https://github.com/bilalcodes1/UniPrint/releases/latest/download/UniPrint.dmg"
+    <a href="https://github.com/bilalcodes1/UniPrint-v2/releases/latest/download/UniPrint.dmg"
        class="btn-download btn-mac" id="btn-mac">
       <span class="btn-icon">🍎</span>
       <span class="btn-text">
@@ -240,12 +240,12 @@
     <h2>جاهز تبدأ؟</h2>
     <p>حمّل UniPrint الآن وابدأ استقبال طلبات الطباعة خلال دقائق</p>
     <div class="download-row">
-      <a href="https://github.com/bilalcodes1/UniPrint/releases/latest/download/UniPrint-Setup.exe"
+      <a href="https://github.com/bilalcodes1/UniPrint-v2/releases/latest/download/UniPrint-Setup.exe"
          class="btn-download btn-win" style="background:#fff;color:var(--win)">
         <span class="btn-icon">🪟</span>
         <span class="btn-text">تحميل لـ Windows<small>UniPrint-Setup.exe</small></span>
       </a>
-      <a href="https://github.com/bilalcodes1/UniPrint/releases/latest/download/UniPrint.dmg"
+      <a href="https://github.com/bilalcodes1/UniPrint-v2/releases/latest/download/UniPrint.dmg"
          class="btn-download btn-mac" style="background:rgba(255,255,255,.15)">
         <span class="btn-icon">🍎</span>
         <span class="btn-text">تحميل لـ macOS<small>UniPrint.dmg</small></span>
@@ -257,7 +257,7 @@
 
 <footer>
   <p>🖨️ UniPrint v2.0 — مشروع مفتوح المصدر &nbsp;|&nbsp;
-     <a href="https://github.com/bilalcodes1/UniPrint" style="color:var(--blue)">GitHub</a>
+     <a href="https://github.com/bilalcodes1/UniPrint-v2" style="color:var(--blue)">GitHub</a>
      &nbsp;|&nbsp; بإشراف المهندس بلال زامل أحمد
   </p>
 </footer>
@@ -273,7 +273,7 @@ if (isMac) {
 }
 
 // Fetch latest release version from GitHub API
-fetch('https://api.github.com/repos/bilalcodes1/UniPrint/releases/latest')
+fetch('https://api.github.com/repos/bilalcodes1/UniPrint-v2/releases/latest')
   .then(r => r.json())
   .then(data => {
     if (data.tag_name) {
