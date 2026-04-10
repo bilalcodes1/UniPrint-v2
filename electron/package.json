@@ -57,7 +57,8 @@
       ]
     },
     "dmg": {
-      "title": "UniPrint"
+      "title": "UniPrint",
+      "backgroundColor": "white"
     },
     "win": {
       "icon": "assets/icon.png",
