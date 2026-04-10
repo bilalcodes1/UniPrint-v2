@@ -60,10 +60,10 @@ exe = EXE(
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
-    upx=True,
+    upx=False,
     upx_exclude=[],
     runtime_tmpdir=None,
-    console=False,          # No console window on Windows
+    console=True,           # Keep console=True for cross-platform service compatibility
     disable_windowed_traceback=False,
     target_arch=None,
     codesign_identity=None,

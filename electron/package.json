@@ -30,7 +30,7 @@
       {
         "from": "../backend",
         "to": "backend",
-        "filter": ["**/*", "!uploads/**", "!__pycache__/**", "!*.pyc"]
+        "filter": ["**/*", "!uploads/**", "!__pycache__/**", "!*.pyc", "!uniprint.db", "!dist/**"]
       },
       {
         "from": "../frontend/build",

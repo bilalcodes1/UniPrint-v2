@@ -3,11 +3,11 @@ name: Build UniPrint
 on:
   push:
     tags:
-      - 'v*'          # trigger on v2.0.0, v2.1.0, etc.
-  workflow_dispatch:  # allow manual trigger from GitHub UI
+      - 'v*'
+  workflow_dispatch:
 
 permissions:
-  contents: write   # needed to create GitHub Release
+  contents: write
 
 jobs:
   # ── macOS build → .dmg ──────────────────────────────────────────────────────
@@ -20,46 +20,35 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: electron/package-lock.json
 
-      - name: Setup Python
+      - name: Setup Python 3.11
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      - name: Install Python deps + PyInstaller
+      - name: Install Python deps into backend/venv
         run: |
-          cd backend
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install pyinstaller
+          python -m venv backend/venv
+          backend/venv/bin/pip install --upgrade pip
+          backend/venv/bin/pip install -r backend/requirements.txt
 
-      - name: Build backend (PyInstaller → backend-mac)
-        run: |
-          cd backend
-          pyinstaller uniprint.spec --distpath ../electron/resources --name backend-mac
-          ls -lh ../electron/resources/
-
-      - name: Build frontend (SvelteKit)
+      - name: Build frontend
         run: |
           cd frontend
-          npm ci
+          npm install
           npm run build
 
       - name: Install Electron deps
-        run: |
-          cd electron
-          npm ci
+        run: npm install
+        working-directory: electron
 
       - name: Build macOS .dmg
-        run: |
-          cd electron
-          npm run build:mac
+        run: npm run build:mac
+        working-directory: electron
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload .dmg artifact
+      - name: Upload .dmg
         uses: actions/upload-artifact@v4
         with:
           name: UniPrint-macOS
@@ -75,52 +64,41 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: electron/package-lock.json
 
-      - name: Setup Python
+      - name: Setup Python 3.11
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      - name: Install Python deps + PyInstaller
+      - name: Install Python deps into backend/venv
         run: |
-          cd backend
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install pyinstaller
+          python -m venv backend\venv
+          backend\venv\Scripts\pip install --upgrade pip
+          backend\venv\Scripts\pip install -r backend\requirements.txt
 
-      - name: Build backend (PyInstaller → backend.exe)
-        run: |
-          cd backend
-          pyinstaller uniprint.spec --distpath ..\electron\resources --name backend
-          dir ..\electron\resources\
-
-      - name: Build frontend (SvelteKit)
+      - name: Build frontend
         run: |
           cd frontend
-          npm ci
+          npm install
           npm run build
 
       - name: Install Electron deps
-        run: |
-          cd electron
-          npm ci
+        run: npm install
+        working-directory: electron
 
       - name: Build Windows .exe installer
-        run: |
-          cd electron
-          npm run build:win
+        run: npm run build:win
+        working-directory: electron
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload .exe artifact
+      - name: Upload .exe
         uses: actions/upload-artifact@v4
         with:
           name: UniPrint-Windows
           path: electron/dist/*.exe
 
-  # ── Create GitHub Release with both files ───────────────────────────────────
+  # ── Create GitHub Release ────────────────────────────────────────────────────
   release:
     needs: [build-mac, build-win]
     runs-on: ubuntu-latest
@@ -144,19 +122,12 @@ jobs:
           name: UniPrint ${{ github.ref_name }}
           body: |
             ## 🖨️ UniPrint ${{ github.ref_name }}
-
             نظام إدارة طلبات الطباعة لمكتبات جامعة الأنبار
 
-            ### تحميل
             | النظام | الملف |
             |--------|-------|
-            | 🍎 macOS (Apple Silicon + Intel) | `UniPrint-*.dmg` |
+            | 🍎 macOS (Intel + Apple Silicon) | `UniPrint-*.dmg` |
             | 🪟 Windows 10/11 (64-bit) | `UniPrint-Setup-*.exe` |
-
-            ### متطلبات
-            - macOS 11+ أو Windows 10+
-            - 4GB RAM، 2GB مساحة حرة
-            - اتصال شبكة محلي (Wi-Fi)
           files: ./release/*
           draft: false
           prerelease: false
