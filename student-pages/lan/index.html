@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="UniPrint">
+  <meta name="theme-color" content="#2D6BE4">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/icon-192x192.svg">
+  <link rel="icon" type="image/svg+xml" href="icons/icon-192x192.svg">
+  <title>UniPrint — طلب طباعة</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ===== SCREEN 1: LOGIN / OCR ===== -->
+  <div id="screen-login" class="screen active" role="main">
+    <div class="screen-header">
+      <div class="logo-mark">🖨️</div>
+      <h1 class="app-title">UniPrint</h1>
+      <span class="lan-badge">LAN</span>
+    </div>
+
+    <div id="ocr-mode" class="card login-card animate-slide-up">
+      <div id="camera-wrap" class="camera-wrap hidden">
+        <video id="video" autoplay playsinline muted></video>
+        <canvas id="scan-canvas" hidden></canvas>
+        <div class="scan-overlay">
+          <div class="scan-frame" id="scan-frame"></div>
+          <p class="scan-hint" id="scan-hint">ضع البطاقة داخل الإطار</p>
+        </div>
+        <div id="ocr-progress" class="ocr-progress hidden">
+          <div class="ocr-progress-bar" id="ocr-progress-bar"></div>
+        </div>
+        <button class="btn-icon camera-close" id="btn-close-camera" aria-label="إغلاق الكاميرا">✕</button>
+      </div>
+
+      <div id="camera-idle" class="camera-idle">
+        <div class="camera-idle-icon">📷</div>
+        <h2>امسح بطاقتك الجامعية</h2>
+        <p>سيتعرف النظام تلقائياً على رقمك الوطني</p>
+        <button class="btn btn-primary btn-full" id="btn-open-camera">
+          📷 فتح الكاميرا للتعرف التلقائي
+        </button>
+      </div>
+
+      <div class="divider"><span>أو</span></div>
+
+      <div class="manual-entry">
+        <label class="field-label" for="manual-id">إدخال الرقم الوطني يدوياً</label>
+        <input type="text" id="manual-id" class="input" placeholder="أدخل 12 رقم..."
+          inputmode="numeric" maxlength="12" autocomplete="off">
+        <div id="manual-id-error" class="field-error hidden">يجب أن يكون 12 رقماً</div>
+        <label class="field-label mt-8" for="manual-name">الاسم (اختياري)</label>
+        <input type="text" id="manual-name" class="input" placeholder="اسمك الكامل..." autocomplete="name">
+        <button class="btn btn-ghost btn-full mt-12" id="btn-manual-submit">التالي ←</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SCREEN 2: CONFIRM IDENTITY ===== -->
+  <div id="screen-confirm-id" class="screen" role="main">
+    <div class="screen-header small">
+      <button class="btn-back" id="btn-back-to-login" aria-label="رجوع">←</button>
+      <h2>تأكيد الهوية</h2>
+    </div>
+    <div class="card identity-card animate-slide-up">
+      <div class="identity-avatar">👤</div>
+      <div id="identity-name" class="identity-name">—</div>
+      <div id="identity-id" class="identity-id">—</div>
+      <p class="identity-question">هل هذه معلوماتك الصحيحة؟</p>
+      <div class="btn-row">
+        <button class="btn btn-ghost" id="btn-edit-id">تعديل</button>
+        <button class="btn btn-primary" id="btn-confirm-id">نعم، ابدأ ←</button>
+      </div>
+    </div>
+    <p style="text-align:center;font-size:13px;color:var(--text-tertiary);margin-top:16px;padding:0 24px">
+      🔒 رقمك الوطني مشفّر ولا يُخزّن بشكل مقروء
+    </p>
+  </div>
+
+  <!-- ===== SCREEN 3: FILE UPLOAD ===== -->
+  <div id="screen-upload" class="screen" role="main">
+    <div class="screen-header small">
+      <button class="btn-back" id="btn-back-to-id" aria-label="رجوع">←</button>
+      <h2>رفع الملفات</h2>
+      <span id="upload-student-badge" class="student-badge"></span>
+    </div>
+
+    <div id="drop-zone" class="drop-zone animate-slide-up"
+      role="button" tabindex="0" aria-label="منطقة رفع الملفات">
+      <input type="file" id="file-input" multiple
+        accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.jpg,.jpeg,.png" hidden>
+      <div class="drop-zone-icon">📁</div>
+      <p class="drop-zone-title">اضغط لرفع الملفات</p>
+      <p class="drop-zone-sub">أو اسحبها هنا</p>
+      <p class="drop-zone-types">PDF · DOCX · XLSX · JPG · PNG — حد 20MB للملف</p>
+    </div>
+
+    <div id="file-list" class="file-list stagger"></div>
+    <div id="upload-limit-warning" class="limit-badge hidden">⚠️ الحد الأقصى 5 ملفات</div>
+
+    <div class="bottom-bar">
+      <div class="file-count-label"><span id="file-count">0</span> / 5 ملفات</div>
+      <button class="btn btn-primary" id="btn-to-review" disabled>مراجعة الطلب ←</button>
+    </div>
+  </div>
+
+  <!-- ===== SCREEN 4: REVIEW + SUBMIT ===== -->
+  <div id="screen-review" class="screen" role="main">
+    <div class="screen-header small">
+      <button class="btn-back" id="btn-back-to-upload" aria-label="رجوع">←</button>
+      <h2>مراجعة الطلب</h2>
+    </div>
+
+    <div class="review-card card animate-slide-up">
+      <div class="review-section">
+        <div class="review-label">الطالب</div>
+        <div id="review-student" class="review-value">—</div>
+      </div>
+      <div class="review-divider"></div>
+      <div class="review-section">
+        <div class="review-label">الملفات</div>
+        <div id="review-files" class="review-files-list"></div>
+      </div>
+    </div>
+
+    <div class="card notification-card animate-slide-up">
+      <div class="notif-title">إشعار عند جهوز طلبك</div>
+      <div class="notif-options">
+        <label class="notif-option">
+          <input type="radio" name="notif" value="none" checked> بدون إشعار
+        </label>
+        <label class="notif-option">
+          <input type="radio" name="notif" value="telegram"> تليجرام
+        </label>
+        <label class="notif-option">
+          <input type="radio" name="notif" value="email"> بريد إلكتروني
+        </label>
+      </div>
+      <div id="notif-contact-wrap" class="notif-contact hidden">
+        <input type="text" id="notif-contact" class="input" placeholder="أدخل معلومات التواصل">
+        <p id="notif-hint" class="field-label" style="margin-top:6px;font-weight:400;color:var(--text-tertiary);font-size:var(--text-xs);"></p>
+      </div>
+    </div>
+
+    <div class="card notification-card animate-slide-up" style="margin-bottom:0">
+      <label class="field-label" for="order-notes">ملاحظات (اختياري)</label>
+      <textarea id="order-notes" class="input" rows="2"
+        placeholder="مثل: طباعة ملوّنة للصفحة الأولى فقط…"
+        style="resize:vertical;min-height:60px"></textarea>
+    </div>
+
+    <button class="btn btn-success btn-full btn-xl animate-slide-up" id="btn-submit">
+      🚀 إرسال الطلب
+    </button>
+    <div id="submit-error-wrap" class="hidden" style="text-align:center;margin-top:8px;display:flex;flex-direction:column;gap:8px;align-items:center">
+      <div id="submit-error" class="field-error"></div>
+      <button id="btn-retry-submit" class="btn btn-ghost btn-sm">↻ حاول مجدداً</button>
+    </div>
+  </div>
+
+  <!-- ===== SCREEN 5: TRACKING ===== -->
+  <div id="screen-tracking" class="screen" role="main">
+    <div class="screen-header small">
+      <div class="logo-mark small">🖨️</div>
+      <h2>طلبك</h2>
+    </div>
+
+    <div class="card tracking-hero animate-slide-up">
+      <p class="tracking-label">رمز التحقق — اعرضه لسعد</p>
+      <div id="tracking-code" class="tracking-code">- - - -</div>
+      <p id="tracking-order-id" class="tracking-order-id">طلب #—</p>
+      <button class="btn btn-ghost btn-sm copy-code-btn" id="btn-copy-code" aria-label="نسخ الرمز">
+        📋 نسخ الرمز
+      </button>
+    </div>
+
+    <div id="wait-badge" class="wait-badge hidden animate-slide-up">
+      <span>📍 موقعك في الطابور: <strong id="queue-num">#—</strong></span>
+      <span>⏱️ وقت متوقع: <strong id="wait-time">—</strong></span>
+    </div>
+
+    <div class="card timeline-card animate-slide-up">
+      <div class="timeline">
+        <div class="tl-step" data-status="received">
+          <div class="tl-dot">✓</div>
+          <div class="tl-line"></div>
+          <div class="tl-label">استُلم</div>
+        </div>
+        <div class="tl-step" data-status="waiting">
+          <div class="tl-dot">⏳</div>
+          <div class="tl-line"></div>
+          <div class="tl-label">انتظار</div>
+        </div>
+        <div class="tl-step" data-status="ready">
+          <div class="tl-dot">🖨️</div>
+          <div class="tl-line"></div>
+          <div class="tl-label">جاهز</div>
+        </div>
+        <div class="tl-step" data-status="delivered">
+          <div class="tl-dot">🎉</div>
+          <div class="tl-line hidden"></div>
+          <div class="tl-label">سُلّم</div>
+        </div>
+      </div>
+      <div id="tracking-status-msg" class="tracking-status-msg">جارٍ المعالجة…</div>
+    </div>
+
+    <button class="btn btn-ghost btn-full" id="btn-new-order">↩️ طلب جديد</button>
+  </div>
+
+  <!-- ===== SCREEN 6: DELIVERY COMPLETION ===== -->
+  <div id="screen-completion" class="screen" role="main">
+    <div class="screen-header small">
+      <div class="logo-mark small">🖨️</div>
+      <h2>تم!</h2>
+    </div>
+
+    <div class="card completion-card animate-slide-up">
+      <div class="completion-checks">
+        <span>✓</span><span>✓</span><span>✓</span>
+      </div>
+      <div class="completion-title" id="completion-greeting">تم التسليم! 🎊</div>
+      <div class="completion-sub" id="completion-sub">طلبك جاهز للاستلام</div>
+      <div class="stat-pills" id="completion-stats"></div>
+      <div class="rating-wrap">
+        <p class="rating-label">كيف كانت تجربتك؟</p>
+        <div class="rating-stars" id="rating-stars">
+          <span data-r="1">⭐</span>
+          <span data-r="2">⭐</span>
+          <span data-r="3">⭐</span>
+          <span data-r="4">⭐</span>
+          <span data-r="5">⭐</span>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn btn-primary btn-full btn-xl animate-slide-up" id="btn-completion-new"
+      style="margin:16px">
+      🖨️ طلب جديد
+    </button>
+  </div>
+
+  <!-- ===== TOAST ===== -->
+  <div id="toast-container" role="status" aria-live="polite"></div>
+
+  <!-- ===== PWA Install Banner (Android) ===== -->
+  <div id="pwa-banner" class="pwa-banner" style="display:none" role="banner">
+    <div class="pwa-banner__icon">🖨️</div>
+    <div class="pwa-banner__text">
+      <strong>إضافة UniPrint للشاشة الرئيسية</strong>
+      <span>وصول أسرع · يعمل بدون متصفح</span>
+    </div>
+    <button class="pwa-banner__install" id="btn-pwa-install">إضافة</button>
+    <button class="pwa-banner__close" id="btn-pwa-dismiss" aria-label="إغلاق">✕</button>
+  </div>
+
+  <!-- ===== iOS Install Modal ===== -->
+  <div id="ios-modal" class="ios-modal" style="display:none" role="dialog" aria-modal="true">
+    <div class="ios-modal__card">
+      <div class="ios-modal__header">
+        <div style="font-size:48px">🖨️</div>
+        <h2>افتح UniPrint كتطبيق</h2>
+        <p>يعمل كتطبيق مستقل بدون شريط المتصفح</p>
+      </div>
+      <div class="ios-modal__steps">
+        <div class="ios-step"><span class="ios-step__num">1</span><span>اضغط أيقونة المشاركة ⬆️ في Safari</span></div>
+        <div class="ios-step"><span class="ios-step__num">2</span><span>اختر "إضافة إلى الشاشة الرئيسية"</span></div>
+        <div class="ios-step"><span class="ios-step__num">3</span><span>اضغط "إضافة" في الأعلى</span></div>
+      </div>
+      <div class="ios-modal__arrow">↓</div>
+      <button class="btn btn-ghost btn-full" id="btn-ios-close">مفهوم، شكراً!</button>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+  <script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .catch(err => console.warn('SW registration failed:', err));
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+venv/
+.venv/
+*.egg-info/
+dist/
+build/
+
+# Environment / secrets
+.env
+*.env
+.env.*
+
+# Database & uploads
+backend/uniprint.db
+backend/uploads/
+
+# Node
+node_modules/
+frontend/.svelte-kit/
+frontend/build/
+
+# Electron build output
+electron/dist/
+electron/resources/backend*
+
+# macOS
+.DS_Store

@@ -1,0 +1,26 @@
+{
+  "name": "uniprint-dashboard",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "vite dev --port 3000",
+    "build": "vite build",
+    "preview": "vite preview",
+    "check": "svelte-kit sync && svelte-check --tsconfig ./jsconfig.json"
+  },
+  "devDependencies": {
+    "@sveltejs/adapter-static": "^3.0.4",
+    "@sveltejs/kit": "^2.5.18",
+    "@sveltejs/vite-plugin-svelte": "^3.1.1",
+    "autoprefixer": "^10.4.19",
+    "postcss": "^8.4.38",
+    "svelte": "^4.2.18",
+    "svelte-check": "^3.8.0",
+    "tailwindcss": "^3.4.4",
+    "vite": "^5.3.1"
+  },
+  "dependencies": {
+    "socket.io-client": "^4.7.5"
+  },
+  "type": "module"
+}

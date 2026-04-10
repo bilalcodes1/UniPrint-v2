@@ -1,0 +1,68 @@
+{
+  "name": "uniprint",
+  "productName": "UniPrint",
+  "version": "2.0.0",
+  "description": "نظام طباعة المكتبة الجامعية",
+  "main": "main.js",
+  "author": "UniPrint Team",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "build:mac": "electron-builder --mac",
+    "build:win": "electron-builder --win",
+    "build": "electron-builder"
+  },
+  "dependencies": {
+    "electron-store": "^8.1.0"
+  },
+  "devDependencies": {
+    "electron": "^30.0.0",
+    "electron-builder": "^24.13.0"
+  },
+  "build": {
+    "appId": "com.uniprint.app",
+    "productName": "UniPrint",
+    "copyright": "UniPrint 2025",
+    "directories": {
+      "output": "dist"
+    },
+    "extraResources": [
+      {
+        "from": "../backend",
+        "to": "backend",
+        "filter": ["**/*", "!uploads/**", "!__pycache__/**", "!*.pyc"]
+      },
+      {
+        "from": "../frontend/build",
+        "to": "dashboard"
+      },
+      {
+        "from": "../student-pages",
+        "to": "student-pages"
+      }
+    ],
+    "mac": {
+      "category": "public.app-category.productivity",
+      "icon": "assets/icon.icns",
+      "target": [
+        { "target": "dmg", "arch": ["arm64", "x64"] }
+      ]
+    },
+    "dmg": {
+      "title": "UniPrint",
+      "backgroundColor": "#2D6BE4"
+    },
+    "win": {
+      "icon": "assets/icon.ico",
+      "target": [
+        { "target": "nsis", "arch": ["x64"] }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    }
+  }
+}
