@@ -6,6 +6,11 @@
   "main": "main.js",
   "author": "UniPrint Team",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bilalcodes1/UniPrint-v2.git"
+  },
+  "homepage": "https://github.com/bilalcodes1/UniPrint-v2",
   "scripts": {
     "start": "electron .",
     "build:mac": "electron-builder --mac",
@@ -53,7 +58,7 @@
       "backgroundColor": "#2D6BE4"
     },
     "win": {
-      "icon": "assets/icon.ico",
+      "icon": "assets/icon.png",
       "target": [
         { "target": "nsis", "arch": ["x64"] }
       ]
@@ -63,6 +68,11 @@
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "bilalcodes1",
+      "repo": "UniPrint-v2"
     }
   }
 }
