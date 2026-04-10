@@ -1,4 +1,5 @@
 import os
+import sys
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -14,17 +15,24 @@ from workers.supabase_sync import start_supabase_sync
 from workers.mdns import start_mdns
 from workers.scheduler import start_scheduler
 
-STUDENT_PAGES_DIR  = os.path.join(os.path.dirname(__file__), '..', 'student-pages')
-DASHBOARD_BUILD    = os.path.join(os.path.dirname(__file__), '..', 'frontend', 'build')
+if getattr(sys, 'frozen', False):
+    _RESOURCES        = os.path.dirname(sys.executable)
+    _DATA_DIR         = os.path.join(_RESOURCES, 'backend')
+    STUDENT_PAGES_DIR = os.path.join(_RESOURCES, 'student-pages')
+    DASHBOARD_BUILD   = os.path.join(_RESOURCES, 'dashboard')
+else:
+    _DATA_DIR         = os.path.dirname(os.path.abspath(__file__))
+    STUDENT_PAGES_DIR = os.path.join(_DATA_DIR, '..', 'student-pages')
+    DASHBOARD_BUILD   = os.path.join(_DATA_DIR, '..', 'frontend', 'build')
 
 
 def create_app():
     app = Flask(__name__)
 
     app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'uniprint-secret-2025')
-    app.config['UPLOAD_FOLDER'] = os.path.join(os.path.dirname(__file__), 'uploads')
+    app.config['UPLOAD_FOLDER'] = os.path.join(_DATA_DIR, 'uploads')
     app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024  # 100 MB total
-    app.config['DB_PATH'] = os.path.join(os.path.dirname(__file__), 'uniprint.db')
+    app.config['DB_PATH'] = os.path.join(_DATA_DIR, 'uniprint.db')
 
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
